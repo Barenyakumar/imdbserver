@@ -1,4 +1,4 @@
-const Producer = require("../db/models/Producer")
+const Producer = require("../db/models/Producer.js")
 
 
 module.exports = (app) => {

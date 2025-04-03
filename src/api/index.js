@@ -1,5 +1,5 @@
 module.exports = {
-    actorAPI: require("./actor"),
-    producerAPI: require("./producer"),
-    movieAPI: require("./movies")
+    actorAPI: require("./actor.js"),
+    producerAPI: require("./producer.js"),
+    movieAPI: require("./movies.js")
 }

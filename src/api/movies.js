@@ -1,6 +1,6 @@
-const Actor = require("../db/models/actor");
-const Movie = require("../db/models/Movie");
-const Producer = require("../db/models/Producer");
+const Actor = require("../db/models/actor.js");
+const Movie = require("../db/models/Movie.js");
+const Producer = require("../db/models/Producer.js");
 
 module.exports = (app) => {
   app.get("/movies", async (req, res) => {
