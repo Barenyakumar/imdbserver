@@ -1,4 +1,4 @@
-const Actor = require("../db/models/actor.js");
+const Actor = require("../db/models/Actor.js");
 const Movie = require("../db/models/Movie.js");
 const Producer = require("../db/models/Producer.js");
 

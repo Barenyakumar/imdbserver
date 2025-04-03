@@ -1,4 +1,4 @@
-const Actor = require("../db/models/actor.js");
+const Actor = require("../db/models/Actor.js");
 
 
 module.exports = (app) => {
