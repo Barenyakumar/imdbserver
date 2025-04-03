@@ -110,7 +110,7 @@ module.exports = (app) => {
       }
 
       if (newActors && Array.isArray(newActors)) {
-        const createdActors = await Promise.all(
+        const createdOrFoundActorIds = await Promise.all(
           newActors.map(async (actorData) => {
             const existingActor = await Actor.findOne({
               username: actorData.username,
