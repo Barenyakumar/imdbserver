@@ -1,6 +1,6 @@
-const Actor = require("../db/models/Actor.js");
-const Movie = require("../db/models/Movie.js");
-const Producer = require("../db/models/Producer.js");
+const Actor = require("../db/models/actor");
+const Movie = require("../db/models/Movie");
+const Producer = require("../db/models/Producer");
 
 module.exports = (app) => {
   app.get("/movies", async (req, res) => {
@@ -81,51 +81,47 @@ module.exports = (app) => {
     }
   });
 
-  // PUT update a movie by id
   app.put("/movie/:id", async (req, res) => {
     try {
-      const {
+      let {
         name,
         yearOfRelease,
         plot,
         poster,
         producer,
         actors = [],
-        newActors = [], // Array of new actor objects to be created inline
-        newProducer, // Object containing new producer data
+        newProducer,
+        newActors = [],
       } = req.body;
-
+  
+      let allActorIds = [];
+  
+      // If newProducer data is provided, create it and update the producer reference
       if (newProducer) {
-        const existingProducer = await Producer.findOne({
-          username: newProducer.username,
-        });
-
-        if (existingProducer) {
-          producer = existingProducer._id;
-        } else {
-          const producerDoc = new Producer(newProducer);
-          const savedProducer = await producerDoc.save();
-          producer = savedProducer._id;
-        }
+        const producerInfo = new Producer(newProducer);
+        const savedProducer = await producerInfo.save();
+        producer = savedProducer._id;
       }
-
+  
+      // Process newActors: for each new actor, check if they exist by username; if not, create a new record
       if (newActors && Array.isArray(newActors)) {
-        const createdOrFoundActorIds = await Promise.all(
+        const createdActors = await Promise.all(
           newActors.map(async (actorData) => {
             const existingActor = await Actor.findOne({
               username: actorData.username,
             });
             if (existingActor) return existingActor._id;
-
+  
             const actorDoc = new Actor(actorData);
             return (await actorDoc.save())._id;
           })
         );
-        // actors = actors ? actors.concat(createdActors) : createdActors;
-        allActorIds = [...new Set([...actors, ...createdOrFoundActorIds])];
+        allActorIds = [...actors, ...createdActors];
+      } else {
+        allActorIds = actors;
       }
-
-      // Find the movie to update
+  
+      // Update the movie document with new values
       const updatedMovie = await Movie.findByIdAndUpdate(
         req.params.id,
         {
@@ -140,16 +136,17 @@ module.exports = (app) => {
       )
         .populate("producer")
         .populate("actors");
-
-      if (!updatedMovie) {
+  
+      if (!updatedMovie)
         return res.status(404).json({ error: "Movie not found" });
-      }
-
+  
       res.json(updatedMovie);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+    } catch (error) {
+      console.log("error", error);
+      res.status(500).json({ error: error.message });
     }
   });
+  
 
   // DELETE a movie by id
   app.delete("/movie/:id", async (req, res) => {
